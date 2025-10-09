@@ -19,9 +19,7 @@ export default defineConfig({
 ? 4
 : 5,
   maxFailures: 0,
-  reporter: process.env.CI
-? [['blob']]
-: [['html', { open: 'never' }]],
+  reporter: [['line'], ['html', { open: 'never' }], ['allure-playwright']],
 
 
   use: {

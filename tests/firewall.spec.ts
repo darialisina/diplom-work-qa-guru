@@ -997,10 +997,13 @@ test.describe('Межсетевые экраны', () => {
         const responsePromise = page.waitForResponse(apiUrl)
         await page.goto(firewallPageUrl)
         const response = await responsePromise
+        
 
         // Указываем TypeScript тип для данных из API
         const apiResponseData = await response.json() as { result: ApiConfig[] }
         const allApiConfigs = apiResponseData.result
+
+      
 
         // Фильтруем данные из API, чтобы получить только те, которые мы ожидаем увидеть
         const expectedConfigs = allApiConfigs.filter(config =>
@@ -1025,7 +1028,12 @@ test.describe('Межсетевые экраны', () => {
           }
 
           // Нажать на выпадающий список "Порты"
+          test.step('Нажать на выпадающий список "Порты"', async (step) => {
           await firewallPage.portsFilter.click()
+          step.attach('Локатор фильтра', {
+            body: String(firewallPage.portsFilter)
+          })
+          })
 
           // Проверяем, что параметр отображен в списке
           await expect.soft(firewallPage.portCheckboxes.nth(i)).toHaveText(portType[i].name)
