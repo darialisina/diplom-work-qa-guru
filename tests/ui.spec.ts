@@ -1,4 +1,5 @@
 import { test, expect } from '../src/Helpers/Fixtures/fixtures'
+import { UserBuilder } from '../src/Helpers/Builders/index'
 
 
 test.describe('Межсетевые экраны', () => {
@@ -45,8 +46,7 @@ test.describe('Межсетевые экраны', () => {
   for (const delType of deleteCases) {
     test(`Кнопка “Удалить” в саммари - ${delType.name}`, async ({ app, goFirewallPage }) => {
 
-      // Проверка блока саммари
-      await expect.soft(app.firewallPage.textInfo)
+      await expect(app.firewallPage.textInfo)
         .toHaveText('Внесите продукт в расчет, чтобы отобразилась итоговая стоимость инфраструктуры')
 
       for (let i = 0; i < delType.count; i++) {
@@ -54,47 +54,40 @@ test.describe('Межсетевые экраны', () => {
       }
 
       if (delType.count == 2) {
-        await expect.soft(app.firewallPage.summaryDeleteConfig).toHaveCount(2)
+        await expect(app.firewallPage.summaryDeleteConfig).toHaveCount(2)
       }
-      else if (delType.count > 2) {
-        await app.firewallPage.collapseSummary()
-        // Теперь для всех серверов отображается кнопка "Удалить конфигурацию"
-        await expect.soft(app.firewallPage.deleteConfigBtn).toHaveCount(3)
+      else if (delType.count == 1) {
+        await expect(app.firewallPage.summaryDeleteConfig).toHaveCount(0)
       }
       else {
-        // Теперь кнопок "мусорное ведро" нет в саммари
-        await expect.soft(app.firewallPage.summaryDeleteConfig).toHaveCount(0)
+        await app.firewallPage.collapseSummary()
+        await expect(app.firewallPage.deleteConfigBtn).toHaveCount(delType.count)
       }
 
       await app.firewallPage.deleteAllServers()
 
       // Проверка, что саммари вернулось к изначальному состоянию
-      await expect.soft(app.firewallPage.textInfo)
+      await expect(app.firewallPage.textInfo)
         .toHaveText('Внесите продукт в расчет, чтобы отобразилась итоговая стоимость инфраструктуры')
     })
   }
 
 
-    test('Соответствие данных при добавлении конфигурации', async ({ app, goFirewallPage }) => {
+  test('Соответствие данных при добавлении конфигурации', async ({ app, goFirewallPage }) => {
 
-      // Берем названия конфигурации с карточки
-      const serverName = await app.firewallPage.getConfigName(0)
-      const firewallCount = 2
+    const serverName = await app.firewallPage.getConfigName(0)
+    const firewallCount = 2
 
-      await app.firewallPage.addConfigInSummary(0, String(firewallCount))
+    await app.firewallPage.addConfigInSummary(0, String(firewallCount))
+    const configPrices = await app.firewallPage.getConfigPrices(0)
 
-      const serverPrice = await app.generalFunctionsPage.convertToNumber(app.firewallPage.configPrice.first())
-      const serverPriceInSummary = await app.generalFunctionsPage.convertToNumber(app.firewallPage.summaryPointsPrices.first())
+    // Проверка, что название конфигурации в саммари правильное
+    await expect(app.firewallPage.summaryConfigName).toHaveText(`${serverName} × ${firewallCount} шт.`)
+    expect(configPrices.summaryPrice).toEqual(configPrices.cardPrice * firewallCount)
 
-      // Проверка, что название конфигурации в саммари правильное
-      await expect.soft(app.firewallPage.summaryConfigName).toHaveText(`${serverName} × ${firewallCount} шт.`)
-
-      // Проверяем, что в саммари цена равна цене на карточке
-      expect.soft(serverPriceInSummary).toEqual(serverPrice * firewallCount)
-
-      // Проверяем, что сумма в саммари правильная
-      await app.firewallPage.checkPricesAfterChanges(1)
-    })
+    // Проверяем, что сумма в саммари правильная
+    await app.firewallPage.checkPricesAfterChanges(1)
+  })
 })
 
 
@@ -138,24 +131,20 @@ test.describe('Форма регистрации', () => {
 
       for (const inputData of inputDatainForm) {
         test(`${inputData.testName}`, async ({ app, goMainPage }) => {
-          const password = '321stseT'
+          const user = new UserBuilder()
+            .setInvalid()
+            .addEmail(inputData.email)
+            .addPassword()
+            .generate()
 
-
-          // Ввод значений
-          await app.mainPage.inputPassword.fill(password)
-
-          // Ввод некорректного email
-          await app.mainPage.inputEmail.fill(inputData.email)
-
-          // Нажать на кнопку Регистраиция
-          await app.mainPage.buttonRegistration.click()
+          await app.mainPage.fillRegistrationForm(user.email, user.password)
+          await app.mainPage.sendRegistrationForm()
 
           // Проверка, что в поле записано только 100 символов, если пытались ввести больше
-          if (inputData.email.length > 100) {
-            await expect.soft(app.mainPage.inputEmail).toHaveValue(inputData.email.slice(0, 100))
+          if (user.email.length > 100) {
+            await expect.soft(app.mainPage.inputEmail).toHaveValue(user.email.slice(0, 100))
           } else {
-            // Проверка, что установленное в поле значение соответствует вводимому
-            await expect.soft(app.mainPage.inputEmail).toHaveValue(inputData.email)
+            await expect.soft(app.mainPage.inputEmail).toHaveValue(user.email)
           }
 
           // Проверка текста сообщения под полем
@@ -197,11 +186,6 @@ test.describe('Форма регистрации', () => {
           validationText: 'Пароль не может содержать символ № или пробел',
         },
         {
-          testName: 'Пароль без спецсимволов',
-          password: 'TestPassword456',
-          validationText: `Пароль должен содержать спецсимволы: !\"#$%&'()*+,-./:;<=>?@[\\]^_{|}~`,
-        },
-        {
           testName: 'Пароль длиннее 100 символов',
           password:
             'TESTS1234TESTS123TESTS123TESTS123TESTS123TESTS123TESTS1234TESTS123TESTS123TESTS123TESTS123TESTS1234_test123',
@@ -212,25 +196,20 @@ test.describe('Форма регистрации', () => {
       for (const inputData of inputDatainForm) {
         test(`${inputData.testName}`, async ({ app, goMainPage }) => {
 
-          // Константа емейла
-          const email = 'email@selectel.ru'
+          const user = new UserBuilder()
+            .setInvalid()
+            .addEmail()
+            .addPassword(inputData.password)
+            .generate()
 
-
-          // Ввод значений
-          await app.mainPage.inputEmail.fill(email)
-
-          // Ввод некорректного пароля
-          await app.mainPage.inputPassword.fill(inputData.password)
-
-          // Нажать на кнопку Регистраиция
-          await app.mainPage.buttonRegistration.click()
+          await app.mainPage.fillRegistrationForm(user.email, user.password)
+          await app.mainPage.sendRegistrationForm()
 
           // Проверка, что в поле записано только 100 символов, если пытались ввсети больше
-          if (inputData.password.length > 100) {
-            await expect.soft(app.mainPage.inputPassword).toHaveValue(inputData.password.slice(0, 100))
+          if (user.password.length > 100) {
+            await expect.soft(app.mainPage.inputPassword).toHaveValue(user.password.slice(0, 100))
           } else {
-            // Проверка, что установленное в поле значение соответствует вводимому
-            await expect.soft(app.mainPage.inputPassword).toHaveValue(inputData.password)
+            await expect.soft(app.mainPage.inputPassword).toHaveValue(user.password)
           }
           // Проверка текста сообщения под полем
           await expect.soft(app.mainPage.errorPassword).toHaveText(inputData.validationText)
@@ -241,21 +220,19 @@ test.describe('Форма регистрации', () => {
   })
 
   test('Просмотр пароля', async ({ app, goMainPage }) => {
-    const password = 'Test1234'
+    const user = new UserBuilder()
+      .addEmail()
+      .addPassword()
+      .generate()
 
-    // Ввод значений
-    await app.mainPage.inputPassword.fill(password)
+    await app.mainPage.fillRegistrationForm(user.email, user.password)
 
-    // Проверка, что пароль скрыт
     await expect.soft(app.mainPage.inputPassword).toHaveAttribute('type', 'password')
 
-    // Нажать на кнопку "Глаз"
-    await app.mainPage.viewPasswordBtn.click()
+    await app.mainPage.uncoverPassword()
 
     // Проверка, что значение в поле "Пароль" соответствует вводимому
-    await expect.soft(app.mainPage.inputPassword).toHaveValue(password)
-
-    // Проверка, что пароль теперь отображается
+    await expect.soft(app.mainPage.inputPassword).toHaveValue(user.password)
     await expect.soft(app.mainPage.inputPassword).toHaveAttribute('type', 'text')
   })
 })

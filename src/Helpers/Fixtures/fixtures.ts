@@ -1,5 +1,4 @@
 import { test as base, expect } from '@playwright/test'
-import { FirewallPage, GeneralFunctionsPage } from '../../PageObject/index'
 import { App } from '../../PageObject/appPage'
 
 type Fixtures = {

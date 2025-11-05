@@ -10,8 +10,6 @@ export class MainPage {
   errorEmail: Locator
   errorPassword: Locator
 
-  
-
   constructor(page: Page) {
     this.page = page
 
@@ -23,8 +21,25 @@ export class MainPage {
     this.errorPassword = this.page.locator('.call-to-registration .registration-form .input-label').filter({hasNotText: 'Электронная'}).filter({hasNotText: 'Повторите'}).locator('.input-label__error').first()
   }
 
+  // Открыть Главную страницу
   async open(){
     await this.page.goto(`/`)
+  }
+
+  // Заполнить поля Формы регистрации
+  async fillRegistrationForm(email: string, password: string){
+    await this.inputPassword.fill(password)
+    await this.inputEmail.fill(email)
+  }
+
+  // Отправить Форму регистрации
+  async sendRegistrationForm(){
+    await this.buttonRegistration.click()
+  }
+
+  // Посмотреть введенный пароль
+  async uncoverPassword(){
+    await this.viewPasswordBtn.click()
   }
 
 }

@@ -1,3 +1,3 @@
-export * from './firewallPage';
-export * from './generalFunctionsPage';
-export * from './mainPage';
+export * from './firewallPage'
+export * from './generalFunctionsPage'
+export * from './mainPage'

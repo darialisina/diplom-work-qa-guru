@@ -71,117 +71,107 @@ export class FirewallPage {
     this.modalWindow = page.locator('.ant-modal-content')
   }
 
-  async open(){
+  // Открыть страницу "Межсетевые экраны"
+  async open() {
     await this.page.goto(`/prices/calculator/?product=firewall`)
   }
 
-  async getCalculatorCondition(){
+  // Получить состояние списка конфигураций
+  async getCalculatorCondition() {
     return {
       configList: await this.configName.allInnerTexts(),
       configCount: await this.configurationCount.innerText()
     }
   }
 
+  // Возвращаем, отсортирован ли список по цене
   async configIsSorted(order: string) {
-    const configPriceArray = await this.configPrice.all()
+    const configPriceArray = await this.generalFunctionsPage.cropTextArrayAndConvertToNumber(this.configPrice)
     for (let i = 1; i < configPriceArray.length; i++) {
 
-      if (order == 'Самая высокая цена' || order == 'Самая низкая цена'){
-      const prevPrice = await this.generalFunctionsPage.convertToNumber(configPriceArray[i - 1])
-      const currentPrice = await this.generalFunctionsPage.convertToNumber(configPriceArray[i])
+      if (order == 'Самая высокая цена' || order == 'Самая низкая цена') {
 
-      if (order == 'Самая высокая цена' && currentPrice > prevPrice) {
-        return false
+        if (order == 'Самая высокая цена' && configPriceArray[i] > configPriceArray[i - 1]) {
+          return false
+        }
+        else if (order == 'Самая низкая цена' && configPriceArray[i] < configPriceArray[i - 1]) {
+          return false
+        }
       }
-      else if (order == 'Самая низкая цена' && currentPrice < prevPrice) {
-        return false
-      }}
-
     }
     return true
   }
 
-  async chooseSorting(type: string){
+  // Выбрать вариант сортировки
+  async chooseSorting(type: string) {
     const typeLocator = this.sortTypeButton.filter({ hasText: type })
 
     await this.sortButton.click()
     await typeLocator.click()
   }
 
-  // Добавление конфигурации в расчет
+  // Добавить конфигурацию в расчет
   async addConfigInSummary(index = 0, firewallCount = '1', region = 'Санкт-Петербург') {
-
-    // Нажать "Добавить" у указанного по счету сервера
     await this.addConfigButtons.nth(index).click()
 
-    // Сохраняем название сервера в модалке
     const modalTitleText = await this.modalTitle.innerText()
-
-    // Ввод количества нод
     await this.modalNumInput.fill(firewallCount)
 
-    // Наличие инпута региона
     let haveRegionInput = await this.modalRegionInput.count()
-    // Изменяем регион
     if (region != 'Санкт-Петербург' && haveRegionInput != 0) {
-      // Раскрыть список "Регион"
       await this.modalRegionInput.click()
       await this.modalRegionList.filter({ hasText: region }).click()
-
     }
 
-    // Нажать "Добавить сервер" в модалке
     await this.modalAddButton.click()
-
-    // Возвращаем название сервера из модалки
     return modalTitleText
   }
 
-  async deleteAllServers(){
-    // Удалить добавленный сервер из саммари
+  // Удалить все конфигурации из саммари
+  async deleteAllServers() {
     await this.summaryDeleteCalc.click()
     await this.generalFunctionsPage.alertDelete()
   }
 
-  async collapseSummary(){
-    // Развернем данные для каждой конфигурации
+  // Раскрыть все пугкты конфигураций в саммари
+  async collapseSummary() {
     const collapseBtns = await this.summaryCardCollapse.all()
     for (let i = 0; i < collapseBtns.length - 1; i++) {
       await collapseBtns[i].click()
     }
   }
 
-  async getConfigName(index: number){
+  // Получить название определенной конфигурации
+  async getConfigName(index: number) {
     return await this.configName.nth(index).innerText()
   }
 
-  async checkPricesAfterChanges(countPrice:number) {
+  // Получить стоимость определенной конфигурации
+  async getConfigPrices(index: number) {
+    return {
+      cardPrice: await this.generalFunctionsPage.convertToNumber(this.configPrice.nth(index)),
+      summaryPrice: await this.generalFunctionsPage.convertToNumber(this.summaryPointsPrices.nth(index))
+    }
+  }
 
-    // Цены после изменений
+  // Проверка суммы цен в саммари
+  async checkPricesAfterChanges(countPrice: number) {
     const totalPriceAfterChanges = await this.generalFunctionsPage.convertToNumber(this.totalPrice)
     const sumPriceAfterChanges = await this.generalFunctionsPage.convertToNumber(this.sumPriceTitle)
     const pricesServiceArrayAfterChanges = await this.generalFunctionsPage.cropTextArrayAndConvertToNumber(this.summaryPointsPrices)
 
-    // Сравнение суммы в карточке саммари и над саммари
     expect.soft(totalPriceAfterChanges).toBe(sumPriceAfterChanges)
-
-    // Количество цен (Без конфигурации)
     expect.soft(pricesServiceArrayAfterChanges.length).toBe(countPrice)
-
-    // Сравнение без первого элемента массива
     expect.soft(pricesServiceArrayAfterChanges.slice(1).every(item => item != 0)).toBeTruthy()
-
-    // Сравнение суммы значений установленных ресурсов с итоговой суммой    
     expect.soft(Math.round(await this.sumAllValueNumbers(pricesServiceArrayAfterChanges)))
-    .toEqual(Math.round(totalPriceAfterChanges))
- }
+      .toEqual(Math.round(totalPriceAfterChanges))
+  }
 
- async sumAllValueNumbers(arrayValue:number[]) {
-  const reducer = (accumulator:number, currentValue:number) => accumulator + currentValue
-  const sumAllPrices = Number(((arrayValue.reduce(reducer)).toFixed(2)))
-  return sumAllPrices
-}
-
-
+  // Сложение значений из поступившего массива
+  async sumAllValueNumbers(arrayValue: number[]) {
+    const reducer = (accumulator: number, currentValue: number) => accumulator + currentValue
+    const sumAllPrices = Number(((arrayValue.reduce(reducer)).toFixed(2)))
+    return sumAllPrices
+  }
 
 }
