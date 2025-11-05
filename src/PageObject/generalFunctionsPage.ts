@@ -9,7 +9,7 @@ const COOKIE_PATH = path.join(__dirname, '../../tests/Data for Tests/cookies/coo
 
 
 
-export default class GeneralFunctionsPage {
+export class GeneralFunctionsPage {
   page: Page;
   context?: BrowserContext;
   productCatalog: Locator;
@@ -17,6 +17,10 @@ export default class GeneralFunctionsPage {
   constructor(page: Page, context?: BrowserContext) {
     this.page = page;
     this.context = context;
+  }
+
+  async close(){
+    await this.page.close()
   }
 
   
@@ -289,17 +293,7 @@ async blockUnwantedRequests() {
 }
 
 
-// После внедрения фикстуры удалить приставку New
-// Предварительные действия
-async preActionsNew() {
 
-  // Удалить не нужные компоненты на странице
-  await this.removeComponents()
-
-  // Поиск неккоректных значений
-  await this.findIncorrectValue()
-
-}
 
  // Проверка ошибки валидации у каунтера
  async errorTextCounters(locatorArrayCounters:string) {
