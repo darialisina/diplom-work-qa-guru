@@ -8,3 +8,5 @@ node_modules/
 /playwright/.auth/
 /allure-results/
 .DS_Store
+/console_errors/
+/allure-report/
