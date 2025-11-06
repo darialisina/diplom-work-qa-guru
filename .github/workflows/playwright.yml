@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 # Описываем джобы
 jobs:
-  test:
+  diplom-work:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
@@ -36,5 +36,5 @@ jobs:
       with:
         token: ${{ secrets.TELEGRAM_TOKEN }}
         to: ${{ secrets.TELEGRAM_CHAT_ID }}
-        message: "Job - ${{ github.job }}; status - ${{ job.status }}"
+        message: "Прогон тестов закончен! Job - ${{ github.job }}. Статус прогона - ${{ job.status }}"
 
