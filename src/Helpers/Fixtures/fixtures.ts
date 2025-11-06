@@ -1,8 +1,10 @@
 import { test as base, expect } from '@playwright/test'
 import { App } from '../../PageObject/appPage'
+import { Api } from "../../Services/apiService"
 
 type Fixtures = {
   app: App
+  api: Api
   goFirewallPage: void
   goMainPage: void
 }
@@ -10,8 +12,13 @@ type Fixtures = {
 export const test = base.extend<Fixtures>({
 
   app: async ({ page }, use) => {
-    const app = new App(page);
-    await use(app);
+    const app = new App(page)
+    await use(app)
+  },
+
+  api: async ({ request }, use) => {
+    const api = new Api(request)
+    await use(api)
   },
 
   goFirewallPage: async ({ app }, use) => {
