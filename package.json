@@ -1,11 +1,17 @@
 {
   "dependencies": {
+    "@faker-js/faker": "^10.1.0",
+    "allure": "^3.0.0-beta.18",
+    "allure-playwright": "^3.4.1",
     "playwright": "^1.56.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.56.0",
+    "@playwright/test": "^1.56.1",
     "@types/node": "^24.7.0"
   },
-  "scripts": {},
+  "scripts": {
+    "test": "npx playwright test",
+    "allureFile": "npx allure awesome ./allure-results --single-file"
+  },
   "type": "module"
 }
