@@ -35,5 +35,5 @@ jobs:
       with:
         token: ${{ secrets.TELEGRAM_TOKEN }}
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
-          message: "Job ${{ github.job }} status: ${{ job.status }}"
+          message: "Job - ${{ github.job }}; status - ${{ job.status }}"
 
