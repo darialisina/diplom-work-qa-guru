@@ -30,3 +30,10 @@ jobs:
         name: playwright-report
         path: playwright-report/
         retention-days: 30
+    - name: Send Telegram Notification
+      uses: appleboy/telegram-action@master
+      with:
+        token: ${{ secrets.TELEGRAM_TOKEN }}
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          message: "Job ${{ github.job }} status: ${{ job.status }}"
+
