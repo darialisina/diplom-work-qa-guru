@@ -34,24 +34,12 @@ jobs:
         name: allure-report
         path: allure-report/
         retention-days: 30
-    - name: Download allurectl CLI
-      if: always()
-      run: |
-        wget https://github.com/allure-framework/allurectl/releases/latest/download/allurectl-linux-amd64
-        chmod +x allurectl-linux-amd64
-        sudo mv allurectl-linux-amd64 /usr/local/bin/allurectl
-    - name: Upload results to Allure TestOps
-      if: always()
-      env:
-        ALLURE_PROJECT_ID: 4995
-        ALLURE_ENDPOINT: https://allure.autotests.cloud
-        ALLURE_API_TOKEN: ${{ secrets.ALLURE_API_TOKEN }}  # сохранённый секрет в GitHub
-      run: |
-        allurectl upload \
-          -o $ALLURE_PROJECT_ID \
-          --endpoint $ALLURE_ENDPOINT \
-          --token $ALLURE_API_TOKEN \
-          --results ./allure-results
+    - name: Install and configure allurectl
+        uses: allure-framework/setup-allurectl@v1.0.2
+        with:
+          allure-endpoint: https://allure.autotests.cloud/
+          allure-token: ${{ secrets.ALLURE_API_TOKEN }}
+          allure-project-id: 4995
     - name: Send Telegram Notification
       uses: appleboy/telegram-action@master
       if: always()
