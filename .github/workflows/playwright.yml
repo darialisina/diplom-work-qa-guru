@@ -42,6 +42,7 @@ jobs:
         allure-token: ${{ secrets.ALLURE_API_TOKEN }}
         allure-project-id: 4995
     - name: Upload results to Allure TestOps
+      if: always()
       env:
         ALLURE_PROJECT_ID: 4995
         ALLURE_ENDPOINT: https://allure.autotests.cloud
