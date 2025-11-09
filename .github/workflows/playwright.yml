@@ -25,10 +25,11 @@ jobs:
     - name: Run Playwright tests
       run: npx playwright test
     - name: Generate Allure report
+      if: always()
       run: npx allure awesome ./allure-results --single-file
     - name: Save Allure report
       uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
+      if: always()
       with:
         name: allure-report
         path: allure-report/

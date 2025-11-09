@@ -54,7 +54,7 @@ test.describe('Межсетевые экраны', () => {
       }
 
       if (delType.count == 2) {
-        await expect(app.firewallPage.summaryDeleteConfig).toHaveCount(2)
+        await expect(app.firewallPage.summaryDeleteConfig).toHaveCount(4)
       }
       else if (delType.count == 1) {
         await expect(app.firewallPage.summaryDeleteConfig).toHaveCount(0)
