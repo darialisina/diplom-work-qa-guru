@@ -35,6 +35,7 @@ jobs:
         path: allure-report/
         retention-days: 30
     - name: Upload results to Allure TestOps
+      if: always()
       env:
         ALLURE_PROJECT_ID: 4995
         ALLURE_ENDPOINT: https://allure.autotests.cloud
