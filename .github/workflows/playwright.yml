@@ -35,11 +35,12 @@ jobs:
         path: allure-report/
         retention-days: 30
     - name: Install and configure allurectl
-        uses: allure-framework/setup-allurectl@v1.0.2
-        with:
-          allure-endpoint: https://allure.autotests.cloud/
-          allure-token: ${{ secrets.ALLURE_API_TOKEN }}
-          allure-project-id: 4995
+      uses: allure-framework/setup-allurectl@v1.0.2
+      if: always()
+      with:
+        allure-endpoint: https://allure.autotests.cloud/
+        allure-token: ${{ secrets.ALLURE_API_TOKEN }}
+        allure-project-id: 4995
     - name: Send Telegram Notification
       uses: appleboy/telegram-action@master
       if: always()
