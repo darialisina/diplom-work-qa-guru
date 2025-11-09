@@ -41,6 +41,17 @@ jobs:
         allure-endpoint: https://allure.autotests.cloud/
         allure-token: ${{ secrets.ALLURE_API_TOKEN }}
         allure-project-id: 4995
+    - name: Upload results to Allure TestOps
+      env:
+        ALLURE_PROJECT_ID: 4995
+        ALLURE_ENDPOINT: https://allure.autotests.cloud
+        ALLURE_API_TOKEN: ${{ secrets.ALLURE_API_TOKEN }}
+      run: |
+        allurectl upload \
+          -o $ALLURE_PROJECT_ID \
+          --endpoint $ALLURE_ENDPOINT \
+          --token $ALLURE_API_TOKEN \
+          --results ./allure-results
     - name: Send Telegram Notification
       uses: appleboy/telegram-action@master
       if: always()
