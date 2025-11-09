@@ -34,6 +34,9 @@ jobs:
         name: allure-report
         path: allure-report/
         retention-days: 30
+    - name: Install allurectl
+      if: always()
+      run: npm install -g allurectl
     - name: Upload results to Allure TestOps
       if: always()
       env:
