@@ -34,9 +34,12 @@ jobs:
         name: allure-report
         path: allure-report/
         retention-days: 30
-    - name: Install allurectl
+    - name: Download allurectl CLI
       if: always()
-      run: npm install -g allurectl
+      run: |
+        wget https://github.com/allure-framework/allurectl/releases/latest/download/allurectl-linux-amd64
+        chmod +x allurectl-linux-amd64
+        sudo mv allurectl-linux-amd64 /usr/local/bin/allurectl
     - name: Upload results to Allure TestOps
       if: always()
       env:
