@@ -6,12 +6,12 @@
 - [Запуск тестов через GitHub Actions](#Запуск-тестов-через-GitHub-Actions)
 - [Локальный запуск тестов и генерация отчётов](#Локальный_запуск-тестов-и-генерация-отчётов)
 - [Пример сформированного allure отчёта](#-Пример-сформированного-allure-отчёта)
-- [Отчёт в Allure TestOps](#-Отчёт-в-Allure-TestOps)
+- [Отчёт в ТестОпс](#-Отчёт-в-ТестОпс)
 - [Уведомления в Telegram](#-Уведомления-в-Telegram)
 
 
 ## Описание
-Данный дипломный проект разработан в рамках курса по автоматизации тестирования. Репозиторий содержит набор UI и API тестов, написанных на языке JavaScript с использованием фреймворка Playwright. В качестве системы непрерывной интеграции и доставки применён GitHub Actions, выполняющий автоматический запуск тестов, формирование отчетов Allure, интеграцию с TestOps и отправку уведомлений в Telegram.
+Данный дипломный проект разработан в рамках курса по автоматизации тестирования. Репозиторий содержит набор UI и API тестов, написанных на языке JavaScript с использованием фреймворка Playwright. В качестве системы непрерывной интеграции и доставки применён GitHub Actions, выполняющий автоматический запуск тестов, формирование отчетов Allure, интеграцию с ТестОпс и отправку уведомлений в Telegram.
 
 Объектами тестирования служат:
 
@@ -20,14 +20,14 @@
 **apichallenges.herokuapp.com** — учебный сервис, предназначенный для освоения и отработки навыков тестирования API.
 
 ## Технологический стек
-<img src="img/javascript.png" title="JavaScript" width="50" height="50"/><img src="img/playwright.jpg" title="Playwrite" width="50" height="50"/><img src="img/git.svg" alt="Git" width="50" height="50"/><img src="img/github.png" title="GitHub" alt="GitHub" width="50" height="50"/><img src="img/allure framework.png" alt="Allure Framework" width="50" height="50"/><img src="img/testops.svg" alt="Allure TestOps" width="45" height="45" /><img src="img/fakerjs.svg" alt="Fakerjs" width="50" height="50"/><img src="img/telegram.png" title="Telegram" width="50" height="50"/>
+<img src="img/javascript.png" title="JavaScript" width="50" height="50"/><img src="img/playwright.jpg" title="Playwrite" width="50" height="50"/><img src="img/git.svg" alt="Git" width="50" height="50"/><img src="img/github.png" title="GitHub" alt="GitHub" width="50" height="50"/><img src="img/allure framework.png" alt="Allure Framework" width="50" height="50"/><img src="img/testops.svg" alt="ТестОпс" width="45" height="45" /><img src="img/fakerjs.svg" alt="Fakerjs" width="50" height="50"/><img src="img/telegram.png" title="Telegram" width="50" height="50"/>
 
 ## Запуск тестов через GitHub Actions
 Для запуска тестов необходимо авторизоваться на GitHub и перейти в репозиторий проекта. Тесты запускаются автоматически при push в ветки main, а также при создании Pull Request. Для ручного запуска необходимо перейти во вкладку Actions, выбрать workflow E2E и нажать Run workflow.
 
 После завершения выполнения тестов будет автоматически сформирован Allure-отчет, содержащий детальную информацию о результатах тестирования. Отчет сохраняется как артефакт сборки и доступен для скачивания в течение 30 дней.
 
-Результаты тестирования автоматически загружаются в Allure TestOps для дальнейшего анализа и отслеживания метрик качества.
+Результаты тестирования автоматически загружаются в ТестОпс для дальнейшего анализа и отслеживания метрик качества.
 
 Уведомление о статусе выполнения тестов со ссылкой на Allure-отчет автоматически отправляется в Telegram, что позволяет оперативно отслеживать результаты прогона и быстро реагировать на возникшие проблемы.
 
@@ -42,10 +42,10 @@ npm run test
 npm run allureFile
 ```
 
-## Пример сформированного allure отчёта
+## Пример сформированного Allure отчёта
 ![img.png](img/allure_testops_report_example.png)
 
-## Отчёт в Allure TestOps
+## Отчёт в ТестОпс
 [Ссылка на проект](https://allure.autotests.cloud/project/4995/launches)
 ![img.png](img/allure_report_example.png)
 
