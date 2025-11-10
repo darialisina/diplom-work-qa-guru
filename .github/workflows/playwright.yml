@@ -1,39 +1,82 @@
 name: E2E
-#Когда запускаем
 on:
   push:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
   workflow_dispatch:
-# Описываем джобы
+
 jobs:
-  test:
+  diplom-work:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-    - name: Checkput code
+    - name: Checkout code
       uses: actions/checkout@v5
+
     - name: Install Node.js
       uses: actions/setup-node@v5
       with:
         node-version: lts/*
+
     - name: Install dependencies
       run: npm i
+
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
+
     - name: Run Playwright tests
       run: npx playwright test
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
+
+    - name: Generate Allure report
+      if: always()
+      run: npx allure awesome ./allure-results --single-file
+
+    - name: Save Allure report
+      uses: actions/upload-artifact@v4
+      if: always()
       with:
-        name: playwright-report
-        path: playwright-report/
+        name: allure-report
+        path: allure-report/
         retention-days: 30
+
+    - name: Install and configure allurectl
+      uses: allure-framework/setup-allurectl@v1.0.2
+      if: always()
+      with:
+        allure-endpoint: https://allure.autotests.cloud
+        allure-token: ${{ secrets.ALLURE_API_TOKEN }}
+        allure-project-id: 4995
+
+    - name: Upload results to Allure TestOps
+      id: allure_upload
+      if: always()
+      env:
+        ALLURE_PROJECT_ID: 4995
+        ALLURE_ENDPOINT: https://allure.autotests.cloud
+        ALLURE_API_TOKEN: ${{ secrets.ALLURE_API_TOKEN }}
+      run: |
+        RAW_LINK=$(allurectl upload ./allure-results \
+          --endpoint $ALLURE_ENDPOINT \
+          --token $ALLURE_API_TOKEN \
+          --project-id $ALLURE_PROJECT_ID | grep "Report link:")
+        # Извлекаем чистую ссылку HTTP/HTTPS из строки
+        FULL_LINK=$(echo "$RAW_LINK" | grep -o 'https\?://[^ ]*' | head -1 | tr -d '[:space:]')
+        if [[ -n "$FULL_LINK" ]]; then
+          echo "report_link=$FULL_LINK" >> $GITHUB_OUTPUT
+        else
+          echo "No report link found"
+          exit 1
+        fi
+
     - name: Send Telegram Notification
       uses: appleboy/telegram-action@master
+      if: always()
       with:
         token: ${{ secrets.TELEGRAM_TOKEN }}
-          to: ${{ secrets.TELEGRAM_CHAT_ID }}
-          message: "Job ${{ github.job }} status: ${{ job.status }}"
-
+        to: ${{ secrets.TELEGRAM_CHAT_ID }}
+        message: |
+          Прогон тестов закончен!
+          Job - ${{ github.job }}.
+          Статус прогона - ${{ job.status }}
+          Ссылка на Allure отчет: ${{ steps.allure_upload.outputs.report_link }}
