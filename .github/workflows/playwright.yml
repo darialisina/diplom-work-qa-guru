@@ -51,12 +51,25 @@ jobs:
         allurectl upload ./allure-results \
           --endpoint $ALLURE_ENDPOINT \
           --token $ALLURE_API_TOKEN \
-          --project-id $ALLURE_PROJECT_ID
-    - name: Send Telegram Notification
-      uses: appleboy/telegram-action@master
-      if: always()
-      with:
-        token: ${{ secrets.TELEGRAM_TOKEN }}
-        to: ${{ secrets.TELEGRAM_CHAT_ID }}
-        message: "Прогон тестов закончен! Job - ${{ github.job }}. Статус прогона - ${{ job.status }}"
+          --project-id $ALLURE_PROJECT_ID | grep "Report link:" | awk '{print $3}')
+    echo "report_link=$LINK" >> $GITHUB_OUTPUT
+- name: Send Telegram Notification
+  uses: appleboy/telegram-action@master
+  if: always()
+  with:
+    token: ${{ secrets.TELEGRAM_TOKEN }}
+    to: ${{ secrets.TELEGRAM_CHAT_ID }}
+    message: |
+      Прогон тестов закончен!
+      Job - ${{ github.job }}.
+      Статус прогона - ${{ job.status }}
+      Ссылка на Allure отчет: ${{ steps.allure_upload.outputs.report_link }}
+- name: Send Allure Report File to Telegram
+  uses: appleboy/telegram-upload-file-action@v1.0.3
+  if: always()
+  with:
+    token: ${{ secrets.TELEGRAM_TOKEN }}
+    chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    file: allure-report/index.html
+    caption: "Allure HTML Report"
 
