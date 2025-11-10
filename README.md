@@ -20,13 +20,16 @@
 **apichallenges.herokuapp.com** — учебный сервис, предназначенный для освоения и отработки навыков тестирования API.
 
 ## Технологический стек
-<img src="img/javascript.png" title="JavaScript" width="50" height="50"/><img src="img/playwright.jpg" title="Playwrite" width="50" height="50"/><img src="img/git.svg" alt="Git" width="50" height="50"/><img src="img/github.png" title="GitHub" alt="GitHub" width="50" height="50"/><img src="img/allure framework.png" alt="Allure Framework" width="50" height="50"/><img src="img/allure testops.svg" alt="Allure TestOps" width="45" height="45" /><img src="img/fakerjs.svg" alt="Fakerjs" width="50" height="50"/><img src="img/jenkins.png" alt="Jenkins" width="50" height="50"/><img src="img/telegram.png" title="Telegram" width="50" height="50"/>
+<img src="img/javascript.png" title="JavaScript" width="50" height="50"/><img src="img/playwright.jpg" title="Playwrite" width="50" height="50"/><img src="img/git.svg" alt="Git" width="50" height="50"/><img src="img/github.png" title="GitHub" alt="GitHub" width="50" height="50"/><img src="img/allure framework.png" alt="Allure Framework" width="50" height="50"/><img src="img/testops.svg" alt="Allure TestOps" width="45" height="45" /><img src="img/fakerjs.svg" alt="Fakerjs" width="50" height="50"/><img src="img/telegram.png" title="Telegram" width="50" height="50"/>
 
-## Запуск тестов через Jenkins
-Для запуска тестов необходимо авторизоваться на сайте Jenkins, перейти в нужную джобу и нажать Build Now. 
-После завершения сборки будет сформирован Allure-отчет, содержащий детальную информацию о результатах тестирования.
-Результаты сборки будут автоматически отправлены в Allure TestOps для дальнейшего анализа.
-Уведомление о статусе выполнения будет отправлено в Telegram, что позволяет оперативно отслеживать результаты.
+## Запуск тестов через GitHub Actions
+Для запуска тестов необходимо авторизоваться на GitHub и перейти в репозиторий проекта. Тесты запускаются автоматически при push в ветки main, а также при создании Pull Request. Для ручного запуска необходимо перейти во вкладку Actions, выбрать workflow E2E и нажать Run workflow.
+
+После завершения выполнения тестов будет автоматически сформирован Allure-отчет, содержащий детальную информацию о результатах тестирования. Отчет сохраняется как артефакт сборки и доступен для скачивания в течение 30 дней.
+
+Результаты тестирования автоматически загружаются в Allure TestOps для дальнейшего анализа и отслеживания метрик качества.
+
+Уведомление о статусе выполнения тестов со ссылкой на Allure-отчет автоматически отправляется в Telegram, что позволяет оперативно отслеживать результаты прогона и быстро реагировать на возникшие проблемы.
 
 ## Локальный запуск тестов и генерация отчётов
 
@@ -36,16 +39,14 @@ npm run test
 ```
 Команда для локального формирования отчёта
 ```
-allure generate allure-results -o allure-report
-allure open allure-report
+npm run allureFile
 ```
 
 ## Пример сформированного allure отчёта
-[Ссылка на отчёт](https://daria1004.github.io/jsDiploma)
 ![img.png](img/allure_report_example.png)
 
 ## Отчёт в Allure TestOps
-[Ссылка на проект](https://allure.autotests.cloud/launch/47233)
+[Ссылка на проект](https://allure.autotests.cloud/project/4995/launches)
 ![img.png](img/allure_testops_report_example.png)
 
 ## Уведомления в Telegram
