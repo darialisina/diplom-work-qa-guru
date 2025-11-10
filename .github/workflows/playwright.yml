@@ -65,12 +65,4 @@ jobs:
           Job - ${{ github.job }}.
           Статус прогона - ${{ job.status }}
           Ссылка на Allure отчет: ${{ steps.allure_upload.outputs.report_link }}
-    - name: Send Allure Report File to Telegram
-      uses: appleboy/telegram-upload-file-action@v1.0.3
-      if: always()
-      with:
-        token: ${{ secrets.TELEGRAM_TOKEN }}
-        chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-        file: allure-report/index.html
-        caption: "Allure HTML Report"
 
