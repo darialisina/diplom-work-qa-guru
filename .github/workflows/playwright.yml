@@ -61,7 +61,6 @@ jobs:
           --token $ALLURE_API_TOKEN \
           --project-id $ALLURE_PROJECT_ID | grep "Report link:")
         JOBRUN_ID=$(echo "$RAW_LINK" | grep -oE '[0-9]+$')
-        echo "jobrun_id=$JOBRUN_ID" >> $GITHUB_OUTPUT
 
     - name: Send Telegram Notification
       uses: appleboy/telegram-action@master
