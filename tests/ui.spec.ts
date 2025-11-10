@@ -54,7 +54,7 @@ test.describe('Межсетевые экраны', () => {
       }
 
       if (delType.count == 2) {
-        await expect(app.firewallPage.summaryDeleteConfig).toHaveCount(50)
+        await expect(app.firewallPage.summaryDeleteConfig).toHaveCount(2)
       }
       else if (delType.count == 1) {
         await expect(app.firewallPage.summaryDeleteConfig).toHaveCount(0)
@@ -86,7 +86,7 @@ test.describe('Межсетевые экраны', () => {
     expect(configPrices.summaryPrice).toEqual(configPrices.cardPrice * firewallCount)
 
     // Проверяем, что сумма в саммари правильная
-    await app.firewallPage.checkPricesAfterChanges(1)
+    await app.firewallPage.checkPricesAfterChanges(100)
   })
 })
 
