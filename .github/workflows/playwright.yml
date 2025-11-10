@@ -60,12 +60,12 @@ jobs:
           --endpoint $ALLURE_ENDPOINT \
           --token $ALLURE_API_TOKEN \
           --project-id $ALLURE_PROJECT_ID | grep "Report link:")
-        JOBRUN_ID=$(echo "$RAW_LINK" | grep -oE '[0-9]+$' | tr -d '[:space:]')
-        if [[ -n "$JOBRUN_ID" ]]; then
-          echo "jobrun_id<<$JOBRUN_ID" >> $GITHUB_OUTPUT
-          echo "$JOBRUN_ID" >> $GITHUB_OUTPUT
+        # Извлекаем чистую ссылку HTTP/HTTPS из строки
+        FULL_LINK=$(echo "$RAW_LINK" | grep -o 'https\?://[^ ]*' | head -1 | tr -d '[:space:]')
+        if [[ -n "$FULL_LINK" ]]; then
+          echo "report_link=$FULL_LINK" >> $GITHUB_OUTPUT
         else
-          echo "No jobrun_id found"
+          echo "No report link found"
           exit 1
         fi
 
@@ -79,4 +79,4 @@ jobs:
           Прогон тестов закончен!
           Job - ${{ github.job }}.
           Статус прогона - ${{ job.status }}
-          Ссылка на Allure отчет: https://allure.autotests.cloud/launch/${{ steps.allure_upload.outputs.jobrun_id }}
+          Ссылка на Allure отчет: ${{ steps.allure_upload.outputs.report_link }}
