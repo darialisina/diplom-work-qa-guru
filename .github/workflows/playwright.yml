@@ -52,7 +52,7 @@ jobs:
         LINK=$(allurectl upload ./allure-results \
           --endpoint $ALLURE_ENDPOINT \
           --token $ALLURE_API_TOKEN \
-          --project-id $ALLURE_PROJECT_ID | grep -o 'https\?://[^ )]*' | head -1)
+          --project-id $ALLURE_PROJECT_ID | grep "Report link:" | grep -o 'https\?://[^ )]*')
         echo "report_link=$LINK" >> $GITHUB_OUTPUT
     - name: Send Telegram Notification
       uses: appleboy/telegram-action@master

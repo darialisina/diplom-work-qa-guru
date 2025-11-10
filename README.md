@@ -3,7 +3,7 @@
 ## Содержание
 - [Описание](#Описание)
 - [Технологический стек](#Технологический-стек)
-- [Запуск тестов через Jenkins](#Запуск-тестов-через-Jenkins)
+- [Запуск тестов через GitHub Actions](#Запуск-тестов-через-GitHub-Actions)
 - [Локальный запуск тестов и генерация отчётов](#Локальный_запуск-тестов-и-генерация-отчётов)
 - [Пример сформированного allure отчёта](#-Пример-сформированного-allure-отчёта)
 - [Отчёт в Allure TestOps](#-Отчёт-в-Allure-TestOps)
@@ -15,7 +15,7 @@
 
 Объектами тестирования служат:
 
-**selectel.ru** — веб-сайт, на которой реализованы практические задания для автоматизации интерфейсных тестов.
+**selectel.ru** — веб-сайт, для которого реализованы практические задания для автоматизации интерфейсных тестов.
 
 **apichallenges.herokuapp.com** — учебный сервис, предназначенный для освоения и отработки навыков тестирования API.
 
@@ -43,11 +43,11 @@ npm run allureFile
 ```
 
 ## Пример сформированного allure отчёта
-![img.png](img/allure_report_example.png)
+![img.png](img/allure_testops_report_example.png)
 
 ## Отчёт в Allure TestOps
 [Ссылка на проект](https://allure.autotests.cloud/project/4995/launches)
-![img.png](img/allure_testops_report_example.png)
+![img.png](img/allure_report_example.png)
 
 ## Уведомления в Telegram
 ![img.png](img/tg_report_example.png)
