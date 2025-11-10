@@ -49,13 +49,14 @@ jobs:
         ALLURE_ENDPOINT: https://allure.autotests.cloud
         ALLURE_API_TOKEN: ${{ secrets.ALLURE_API_TOKEN }}
       run: |
-        set +e
-        LINK=$(allurectl upload ./allure-results \
+        RAW_LINK=$(allurectl upload ./allure-results \
           --endpoint $ALLURE_ENDPOINT \
           --token $ALLURE_API_TOKEN \
-          --project-id $ALLURE_PROJECT_ID | grep "Report link:" | grep -o 'https\?://[^ )]*')
-        echo "report_link=$LINK" >> $GITHUB_OUTPUT || true
-        set -e
+          --project-id $ALLURE_PROJECT_ID | grep "Report link:")
+        LINK=$(echo "$RAW_LINK" | sed -n 's/.*\[\(https\?:\/\/[^]]*\)\].*/\1/p')
+        if [[ "$LINK" =~ ^https?:// ]]; then
+          echo "report_link=$LINK" >> $GITHUB_OUTPUT
+        fi
     - name: Send Telegram Notification
       uses: appleboy/telegram-action@master
       if: always()

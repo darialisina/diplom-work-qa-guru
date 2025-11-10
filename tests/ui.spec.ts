@@ -86,7 +86,7 @@ test.describe('Межсетевые экраны', () => {
     expect(configPrices.summaryPrice).toEqual(configPrices.cardPrice * firewallCount)
 
     // Проверяем, что сумма в саммари правильная
-    await app.firewallPage.checkPricesAfterChanges(100)
+    await app.firewallPage.checkPricesAfterChanges(1)
   })
 })
 
