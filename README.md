@@ -1,4 +1,4 @@
-# Дипломный проект, собранный на основе курса по автоматизации тестирования на JavaScript + Playwright
+# Дипломный проект по итогам обучения на курсе QA.GURU | JS + Playwright QA.GURU | JS + Playwright | Автоматизация тестирования 4 поток
 
 ## Содержание
 - [Описание](#Описание)
@@ -11,13 +11,13 @@
 
 
 ## Описание
-Дипломный проект, выполненный в рамках курсов по автоматизации тестирования. В этом репозитории собраны UI и API-тесты, написанные на JavaScript с использованием Playwright. Для CI/CD задействован Jenkins, который обеспечивает выполнение автотестов, генерацию Allure-отчетов, взаимодействие с TestOps и рассылку уведомлений в Telegram.
+Данный дипломный проект разработан в рамках курса по автоматизации тестирования. Репозиторий содержит набор UI и API тестов, написанных на языке JavaScript с использованием фреймворка Playwright. В качестве системы непрерывной интеграции и доставки применён GitHub Actions, выполняющий автоматический запуск тестов, формирование отчетов Allure, интеграцию с TestOps и отправку уведомлений в Telegram.
 
-В качестве объектов тестирования используются:
+Объектами тестирования служат:
 
-**academubugs.com** — веб-сайт, предоставляющий функционал для практики автоматизации ui тестов.
+**selectel.ru** — веб-сайт, на которой реализованы практические задания для автоматизации интерфейсных тестов.
 
-**apichallenges.herokuapp.com** — тренировочный сервис, предназначенный для отработки навыков автоматизации api тестов.
+**apichallenges.herokuapp.com** — учебный сервис, предназначенный для освоения и отработки навыков тестирования API.
 
 ## Технологический стек
 <img src="img/javascript.png" title="JavaScript" width="50" height="50"/><img src="img/playwright.jpg" title="Playwrite" width="50" height="50"/><img src="img/git.svg" alt="Git" width="50" height="50"/><img src="img/github.png" title="GitHub" alt="GitHub" width="50" height="50"/><img src="img/allure framework.png" alt="Allure Framework" width="50" height="50"/><img src="img/allure testops.svg" alt="Allure TestOps" width="45" height="45" /><img src="img/fakerjs.svg" alt="Fakerjs" width="50" height="50"/><img src="img/jenkins.png" alt="Jenkins" width="50" height="50"/><img src="img/telegram.png" title="Telegram" width="50" height="50"/>
