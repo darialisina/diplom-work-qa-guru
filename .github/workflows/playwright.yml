@@ -1,32 +1,37 @@
 name: E2E
-#Когда запускаем
 on:
   push:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
   workflow_dispatch:
-# Описываем джобы
+
 jobs:
   diplom-work:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-    - name: Checkput code
+    - name: Checkout code
       uses: actions/checkout@v5
+
     - name: Install Node.js
       uses: actions/setup-node@v5
       with:
         node-version: lts/*
+
     - name: Install dependencies
       run: npm i
+
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
+
     - name: Run Playwright tests
       run: npx playwright test
+
     - name: Generate Allure report
       if: always()
       run: npx allure awesome ./allure-results --single-file
+
     - name: Save Allure report
       uses: actions/upload-artifact@v4
       if: always()
@@ -34,13 +39,15 @@ jobs:
         name: allure-report
         path: allure-report/
         retention-days: 30
+
     - name: Install and configure allurectl
       uses: allure-framework/setup-allurectl@v1.0.2
       if: always()
       with:
-        allure-endpoint: https://allure.autotests.cloud/
+        allure-endpoint: https://allure.autotests.cloud
         allure-token: ${{ secrets.ALLURE_API_TOKEN }}
         allure-project-id: 4995
+
     - name: Upload results to Allure TestOps
       id: allure_upload
       if: always()
@@ -53,10 +60,11 @@ jobs:
           --endpoint $ALLURE_ENDPOINT \
           --token $ALLURE_API_TOKEN \
           --project-id $ALLURE_PROJECT_ID | grep "Report link:")
-        LINK=$(echo "$RAW_LINK" | sed -n 's/.*\[\(https\?:\/\/[^]]*\)\].*/\1/p')
+        LINK=$(echo "$RAW_LINK" | grep -o 'https\?://[^ ]*')
         if [[ "$LINK" =~ ^https?:// ]]; then
           echo "report_link=$LINK" >> $GITHUB_OUTPUT
         fi
+
     - name: Send Telegram Notification
       uses: appleboy/telegram-action@master
       if: always()
@@ -68,4 +76,3 @@ jobs:
           Job - ${{ github.job }}.
           Статус прогона - ${{ job.status }}
           Ссылка на Allure отчет: ${{ steps.allure_upload.outputs.report_link }}
-
