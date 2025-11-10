@@ -62,7 +62,8 @@ jobs:
           --project-id $ALLURE_PROJECT_ID | grep "Report link:")
         JOBRUN_ID=$(echo "$RAW_LINK" | grep -oE '[0-9]+$' | tr -d '[:space:]')
         if [[ -n "$JOBRUN_ID" ]]; then
-          echo "jobrun_id=$JOBRUN_ID" >> $GITHUB_OUTPUT
+          echo "jobrun_id<<$JOBRUN_ID" >> $GITHUB_OUTPUT
+          echo "$JOBRUN_ID" >> $GITHUB_OUTPUT
         else
           echo "No jobrun_id found"
           exit 1
