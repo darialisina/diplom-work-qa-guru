@@ -4,89 +4,168 @@ import { UserBuilder } from '../src/Helpers/Builders/index'
 
 test.describe('Межсетевые экраны', () => {
 
-  const sortingTypes = ['По популярности', 'Самая низкая цена', 'Самая высокая цена']
-  for (const type of sortingTypes) {
-    test(`Сортировка - ${type}`, async ({ app, goFirewallPage }) => {
+  test(`Сортировка - По популярности`, async ({ app, goFirewallPage }) => {
 
-      await expect(app.firewallPage.sortButton).toHaveText('Самая низкая цена')
-      const defaultCalculatorCondition = await app.firewallPage.getCalculatorCondition()
+    const type = 'По популярности'
 
-      if (type != 'Самая низкая цена') {
-        await app.firewallPage.chooseSorting(type)
-      }
-      let changedCalculatorCondition = await app.firewallPage.getCalculatorCondition()
+    // Ожидание появления кнопки сортировки
+    await app.firewallPage.configList.sortButton.waitFor({ state: 'visible' })
 
-      await expect(app.firewallPage.sortButton).toHaveText(type)
-      expect(changedCalculatorCondition.configCount).toEqual(defaultCalculatorCondition.configCount)
-      expect(await app.firewallPage.configIsSorted(type)).toBeTruthy()
+    // сохраняем состояние калькулятора до изменения сортировки
+    const defaultCalculatorCondition = await app.firewallPage.configList.getCalculatorCondition()
 
-      if (type == 'Самая высокая цена') {
-        expect(changedCalculatorCondition.configList).not.toEqual(defaultCalculatorCondition.configList)
-      }
-      else {
-        expect(changedCalculatorCondition.configList).toEqual(defaultCalculatorCondition.configList)
-      }
+    // изменяем сортировку
+    await app.firewallPage.configList.chooseSorting(type)
+    //Получаем состояние калькулятора после изменения сортировки
+    let changedCalculatorCondition = await app.firewallPage.configList.getCalculatorCondition()
 
-    })
-  }
+    // проверяем, что тип сортировки изменился на выбранный
+    await expect(app.firewallPage.configList.sortButton).toHaveText(type)
+    // проверяем, что количество конфигураций не изменилось
+    expect(changedCalculatorCondition.configCount).toEqual(defaultCalculatorCondition.configCount)
+    // проверяем, что конфигурации отсортированы согласно выбранному типу
+    expect(await app.firewallPage.configList.configIsSorted(type)).toBeTruthy()
 
-  const deleteCases = [
-    {
-      name: 'При одной добавленной конфигурации',
-      count: 1
-    },
-    {
-      name: 'При добавленнии двух конфигураций',
-      count: 2
-    },
-    {
-      name: 'При добавленнии трех и более конфигураций',
-      count: 3
-    }]
-  for (const delType of deleteCases) {
-    test(`Кнопка “Удалить” в саммари - ${delType.name}`, async ({ app, goFirewallPage }) => {
+    // порядок конфигураций должен остаться прежним
+    expect(changedCalculatorCondition.configList).toEqual(defaultCalculatorCondition.configList)
+  })
 
-      await expect(app.firewallPage.textInfo)
-        .toHaveText('Внесите продукт в расчет, чтобы отобразилась итоговая стоимость инфраструктуры')
+  test(`Сортировка - Самая низкая цена`, async ({ app, goFirewallPage }) => {
 
-      for (let i = 0; i < delType.count; i++) {
-        await app.firewallPage.addConfigInSummary(i)
-      }
+    const type = 'Самая низкая цена'
+    const changeType = 'По популярности'
 
-      if (delType.count == 2) {
-        await expect(app.firewallPage.summaryDeleteConfig).toHaveCount(2)
-      }
-      else if (delType.count == 1) {
-        await expect(app.firewallPage.summaryDeleteConfig).toHaveCount(0)
-      }
-      else {
-        await app.firewallPage.collapseSummary()
-        await expect(app.firewallPage.deleteConfigBtn).toHaveCount(delType.count)
-      }
+    // Ожидание появления кнопки сортировки
+    await app.firewallPage.configList.sortButton.waitFor({ state: 'visible' })
 
-      await app.firewallPage.deleteAllServers()
+    // сохраняем состояние калькулятора до изменения сортировки
+    const defaultCalculatorCondition = await app.firewallPage.configList.getCalculatorCondition()
 
-      // Проверка, что саммари вернулось к изначальному состоянию
-      await expect(app.firewallPage.textInfo)
-        .toHaveText('Внесите продукт в расчет, чтобы отобразилась итоговая стоимость инфраструктуры')
-    })
-  }
+    // изменяем сортировку
+    await app.firewallPage.configList.chooseSorting(changeType)
+    await app.firewallPage.configList.chooseSorting(type)
+    //Получаем состояние калькулятора после изменения сортировки
+    let changedCalculatorCondition = await app.firewallPage.configList.getCalculatorCondition()
+
+    // проверяем, что тип сортировки изменился на выбранный
+    await expect(app.firewallPage.configList.sortButton).toHaveText(type)
+    // проверяем, что количество конфигураций не изменилось
+    expect(changedCalculatorCondition.configCount).toEqual(defaultCalculatorCondition.configCount)
+    // проверяем, что конфигурации отсортированы согласно выбранному типу
+    expect(await app.firewallPage.configList.configIsSorted(type)).toBeTruthy()
+
+    // порядок конфигураций должен остаться прежним
+    expect(changedCalculatorCondition.configList).toEqual(defaultCalculatorCondition.configList)
+  })
+
+  test(`Сортировка - Самая высокая цена`, async ({ app, goFirewallPage }) => {
+
+    const type = 'Самая высокая цена'
+
+    // Ожидание появления кнопки сортировки
+    await app.firewallPage.configList.sortButton.waitFor({ state: 'visible' })
+
+    // сохраняем состояние калькулятора до изменения сортировки
+    const defaultCalculatorCondition = await app.firewallPage.configList.getCalculatorCondition()
+
+    // изменяем сортировку
+    await app.firewallPage.configList.chooseSorting(type)
+
+    //Получаем состояние калькулятора после изменения сортировки
+    let changedCalculatorCondition = await app.firewallPage.configList.getCalculatorCondition()
+
+    // проверяем, что тип сортировки изменился на выбранный
+    await expect(app.firewallPage.configList.sortButton).toHaveText(type)
+    // проверяем, что количество конфигураций не изменилось
+    expect(changedCalculatorCondition.configCount).toEqual(defaultCalculatorCondition.configCount)
+    // проверяем, что конфигурации отсортированы согласно выбранному типу
+    expect(await app.firewallPage.configList.configIsSorted(type)).toBeTruthy()
+
+    // для сортировки "Самая высокая цена" порядок конфигураций должен измениться
+    expect(changedCalculatorCondition.configList).not.toEqual(defaultCalculatorCondition.configList)
+
+  })
+
+  test(`Кнопка "Удалить" в саммари - При одной добавленной конфигурации`, async ({ app, goFirewallPage }) => {
+
+    // добавляем в саммари заданное количество конфигураций
+    await app.firewallPage.modal.addConfigInSummary()
+
+    // при одной конфигурации кнопки удаления не должно быть видно
+    await expect(app.firewallPage.summary.summaryDeleteConfig).toHaveCount(0)
+
+    // удаляем все добавленные конфигурации
+    await app.firewallPage.summary.deleteAllServers()
+
+    // проверяем, что саммари вернулось к изначальному состоянию
+    await expect(app.firewallPage.summary.textInfo)
+      .toHaveText('Внесите продукт в расчет, чтобы отобразилась итоговая стоимость инфраструктуры')
+  })
+
+
+  test(`Кнопка "Удалить" в саммари - При добавлении двух конфигураций`, async ({ app, goFirewallPage }) => {
+    // кол-во добавляемых серверов
+    const configCount = 2
+
+    // добавляем в саммари заданное количество конфигураций
+    for (let i = 0; i < configCount; i++) {
+      await app.firewallPage.modal.addConfigInSummary(i)
+    }
+
+    // при двух конфигурациях должны быть видны 2 кнопки удаления
+    await expect(app.firewallPage.summary.summaryDeleteConfig).toHaveCount(2)
+
+    // удаляем все добавленные конфигурации
+    await app.firewallPage.summary.deleteAllServers()
+
+    // проверяем, что саммари вернулось к изначальному состоянию
+    await expect(app.firewallPage.summary.textInfo)
+      .toHaveText('Внесите продукт в расчет, чтобы отобразилась итоговая стоимость инфраструктуры')
+  })
+
+
+  test(`Кнопка "Удалить" в саммари - При добавлении трех и более конфигураций`, async ({ app, goFirewallPage }) => {
+    // кол-во добавляемых серверов
+    const configCount = 3
+
+    // добавляем в саммари заданное количество конфигураций
+    for (let i = 0; i < configCount; i++) {
+      await app.firewallPage.modal.addConfigInSummary(i)
+    }
+
+    // при трех и более конфигурациях разворачиваем саммари и проверяем количество кнопок
+    await app.firewallPage.summary.collapseSummary()
+    await expect(app.firewallPage.summary.deleteConfigBtn).toHaveCount(configCount)
+
+    // удаляем все добавленные конфигурации
+    await app.firewallPage.summary.deleteAllServers()
+
+    // проверяем, что саммари вернулось к изначальному состоянию
+    await expect(app.firewallPage.summary.textInfo)
+      .toHaveText('Внесите продукт в расчет, чтобы отобразилась итоговая стоимость инфраструктуры')
+  })
+
 
 
   test('Соответствие данных при добавлении конфигурации', async ({ app, goFirewallPage }) => {
 
-    const serverName = await app.firewallPage.getConfigName(0)
+    // получаем название первой конфигурации
+    const serverName = await app.firewallPage.configList.getConfigName(0)
+    // указываем количество межсетевых экранов для добавления
     const firewallCount = 2
 
-    await app.firewallPage.addConfigInSummary(0, String(firewallCount))
-    const configPrices = await app.firewallPage.getConfigPrices(0)
+    // добавляем в саммари конфигурацию с указанным количеством
+    await app.firewallPage.modal.addConfigInSummary(0, String(firewallCount))
+    //Получаем цены конфигурации из карточки и саммари
+    const configPrices = await app.firewallPage.configList.getConfigPrices(0)
 
-    // Проверка, что название конфигурации в саммари правильное
-    await expect(app.firewallPage.summaryConfigName).toHaveText(`${serverName} × ${firewallCount} шт.`)
+    // проверяем, что название конфигурации в саммари отображается корректно
+    await expect(app.firewallPage.summary.summaryConfigName).toHaveText(`${serverName} × ${firewallCount} шт.`)
+    // проверяем, что цена в саммари равна цене карточки, умноженной на количество
     expect(configPrices.summaryPrice).toEqual(configPrices.cardPrice * firewallCount)
 
-    // Проверяем, что сумма в саммари правильная
-    await app.firewallPage.checkPricesAfterChanges(1)
+    // проверяем, что итоговая сумма в саммари рассчитана правильно
+    await app.firewallPage.summary.checkPricesAfterChanges(1)
   })
 })
 
@@ -98,57 +177,63 @@ test.describe('Форма регистрации', () => {
       const inputDatainForm = [
         {
           testName: 'Ввод email без @',
-          email: 'emaildomain.com',
+          emailGenerator: (builder) => builder.addEmailWithoutAtSymbol().email,
           validationText: 'Введите корректный email',
         },
         {
           testName: 'Ввод email с пробелом',
-          email: 'email @domain.com',
+          emailGenerator: (builder) => builder.addEmailWithSpace().email,
           validationText: 'Введите корректный email',
         },
         {
           testName: 'Ввод email с двумя точками подряд',
-          email: 'test..test@example.com',
+          emailGenerator: (builder) => builder.addEmailWithTwoDots().email,
           validationText: 'Введите корректный email',
         },
         {
           testName: 'Ввод email без домена',
-          email: 'email@',
+          emailGenerator: (builder) => builder.addEmailWithoutDomain().email,
           validationText: 'Введите корректный email',
         },
         {
           testName: 'Пустое значение в поле для email',
-          email: '',
+          emailGenerator: (builder) => builder.addEmptyEmail().email,
           validationText: 'Введите email',
         },
         {
           testName: 'Ввод email длиннее 100 символов',
-          email:
-            'emailemailemailemailemailemailemailemailemailemailemailemailemailemailemailemailemaiemailemailemail@mail.ru',
+          emailGenerator: (builder) => builder.addLongEmail().email,
           validationText: 'Введите корректный email',
         },
       ]
 
       for (const inputData of inputDatainForm) {
         test(`${inputData.testName}`, async ({ app, goMainPage }) => {
+          // Создаем отдельный builder для генерации email
+          const emailBuilder = new UserBuilder()
+          const email = inputData.emailGenerator(emailBuilder)
+
+          // создаем пользователя с валидным email и невалидным паролем
           const user = new UserBuilder()
             .setInvalid()
-            .addEmail(inputData.email)
+            .addEmail(email)
             .addPassword()
             .generate()
 
+          // заполняем форму регистрации
           await app.mainPage.fillRegistrationForm(user.email, user.password)
+          // отправляем форму регистрации
           await app.mainPage.sendRegistrationForm()
 
-          // Проверка, что в поле записано только 100 символов, если пытались ввести больше
+          // проверяем, что в поле записано только 100 символов, если пытались ввести больше
           if (user.email.length > 100) {
-            await expect.soft(app.mainPage.inputEmail).toHaveValue(user.email.slice(0, 100))
+            await expect(app.mainPage.inputEmail).toHaveValue(user.email.slice(0, 100))
           } else {
-            await expect.soft(app.mainPage.inputEmail).toHaveValue(user.email)
+            await expect(app.mainPage.inputEmail).toHaveValue(user.email)
           }
 
-          // Проверка текста сообщения под полем
-          await expect.soft(app.mainPage.errorEmail).toHaveText(inputData.validationText)
+          // проверяем корректность текста сообщения валидации под полем
+          await expect(app.mainPage.errorEmail).toHaveText(inputData.validationText)
         })
       }
     })
@@ -157,38 +242,37 @@ test.describe('Форма регистрации', () => {
       const inputDatainForm = [
         {
           testName: 'Пароль меньше 12 символов',
-          password: 'Test123!abc',
+          passwordGenerator: (builder) => builder.addShortPassword().password,
           validationText: 'Пароль должен содержать более 12 символов',
         },
         {
           testName: 'Пароль без цифр',
-          password: 'SecurePass@Word',
+          passwordGenerator: (builder) => builder.addPasswordWithoutDigits().password,
           validationText: 'Пароль должен содержать цифры',
         },
         {
           testName: 'Пароль не латинскими буквами',
-          password: 'Привет123',
+          passwordGenerator: (builder) => builder.addPasswordWithCyrillic().password,
           validationText: 'Кириллические символы в пароле не допускаются',
         },
         {
           testName: 'Пароль без букв в верхнем регистре',
-          password: 'mytest123@pass',
+          passwordGenerator: (builder) => builder.addPasswordLowcase().password,
           validationText: 'Пароль должен содержать буквы обоих регистров',
         },
         {
           testName: 'Пароль без букв в нижнем регистре',
-          password: 'PASSWORD123!',
+          passwordGenerator: (builder) => builder.addPasswordUppercase().password,
           validationText: 'Пароль должен содержать буквы обоих регистров',
         },
         {
           testName: 'Пароль с пробелами',
-          password: '123 123 123',
+          passwordGenerator: (builder) => builder.addPasswordWithSpace().password,
           validationText: 'Пароль не может содержать символ № или пробел',
         },
         {
           testName: 'Пароль длиннее 100 символов',
-          password:
-            'TESTS1234TESTS123TESTS123TESTS123TESTS123TESTS123TESTS1234TESTS123TESTS123TESTS123TESTS123TESTS1234_test123',
+          passwordGenerator: (builder) => builder.addLongPassword().password,
           validationText: 'Пароль должен содержать буквы обоих регистров',
         },
       ]
@@ -196,23 +280,30 @@ test.describe('Форма регистрации', () => {
       for (const inputData of inputDatainForm) {
         test(`${inputData.testName}`, async ({ app, goMainPage }) => {
 
+          // Создаем отдельный builder для генерации пароля
+          const passwordBuilder = new UserBuilder()
+          const password = inputData.passwordGenerator(passwordBuilder)
+
+          // создаем пользователя с валидным email и невалидным паролем
           const user = new UserBuilder()
             .setInvalid()
             .addEmail()
-            .addPassword(inputData.password)
+            .addPassword(password)
             .generate()
 
+          // заполняем форму регистрации
           await app.mainPage.fillRegistrationForm(user.email, user.password)
+          // отправляем форму регистрации
           await app.mainPage.sendRegistrationForm()
 
-          // Проверка, что в поле записано только 100 символов, если пытались ввсети больше
+          // проверяем, что в поле записано только 100 символов, если пытались ввести больше
           if (user.password.length > 100) {
-            await expect.soft(app.mainPage.inputPassword).toHaveValue(user.password.slice(0, 100))
+            await expect(app.mainPage.inputPassword).toHaveValue(user.password.slice(0, 100))
           } else {
-            await expect.soft(app.mainPage.inputPassword).toHaveValue(user.password)
+            await expect(app.mainPage.inputPassword).toHaveValue(user.password)
           }
-          // Проверка текста сообщения под полем
-          await expect.soft(app.mainPage.errorPassword).toHaveText(inputData.validationText)
+          // проверяем корректность текста сообщения валидации под полем
+          await expect(app.mainPage.errorPassword).toHaveText(inputData.validationText)
         })
       }
     })
@@ -220,19 +311,24 @@ test.describe('Форма регистрации', () => {
   })
 
   test('Просмотр пароля', async ({ app, goMainPage }) => {
+    // создаем пользователя с валидными данными
     const user = new UserBuilder()
       .addEmail()
       .addPassword()
       .generate()
 
+    // заполняем форму регистрации
     await app.mainPage.fillRegistrationForm(user.email, user.password)
 
-    await expect.soft(app.mainPage.inputPassword).toHaveAttribute('type', 'password')
+    // проверяем, что поле пароля имеет тип "password" (скрытый)
+    await expect(app.mainPage.inputPassword).toHaveAttribute('type', 'password')
 
+    // нажимаем на кнопку "Показать пароль"
     await app.mainPage.uncoverPassword()
 
-    // Проверка, что значение в поле "Пароль" соответствует вводимому
-    await expect.soft(app.mainPage.inputPassword).toHaveValue(user.password)
-    await expect.soft(app.mainPage.inputPassword).toHaveAttribute('type', 'text')
+    // проверяем, что значение в поле "Пароль" соответствует введенному
+    await expect(app.mainPage.inputPassword).toHaveValue(user.password)
+    // проверяем, что тип поля изменился на "text" (видимый)
+    await expect(app.mainPage.inputPassword).toHaveAttribute('type', 'text')
   })
 })

@@ -5,6 +5,7 @@ import { Api } from "../../Services/apiService"
 type Fixtures = {
   app: App
   api: Api
+  apiToken
   goFirewallPage: void
   goMainPage: void
 }
@@ -19,6 +20,13 @@ export const test = base.extend<Fixtures>({
   api: async ({ request }, use) => {
     const api = new Api(request)
     await use(api)
+  },
+
+  apiToken: async ({ api }, use, testinfo) => {
+    const response = await api.challenger.post(testinfo)
+    const headers = response.headers()
+    const token = headers["x-challenger"]
+    await use(token)
   },
 
   goFirewallPage: async ({ app }, use) => {
